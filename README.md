@@ -1,1 +1,2 @@
-# pokeBot
+# stormwars-python-bot
+tbd
