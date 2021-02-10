@@ -7,7 +7,7 @@ import sys
 import os
 
 try:
-    driver = pokeAPI().register_window()
+    driver = pokeAPI().register_window(name="РokеMMO")
     wx, wy = driver.get_window_rect()[:2]
 
     ROUND_COUNT = 0
@@ -29,21 +29,37 @@ try:
 
                 time.sleep(1)
 
-    def navigate_to_grass():
+    def navigate_to_low_level_grass():
         driver.hold_key('left',0.6)
         driver.hold_key('up',1.3)
         driver.hold_key('right',1.7)
         driver.hold_key('up',0.50)
         driver.hold_key('right',.5)
         driver.hold_key('up',2.4)
+        
+    def navigate_to_high_level_grass():
+        #get on bike
+        driver.toggle_bike()
+        driver.hold_key('left',5.6)
+        driver.hold_key('up',1.5)
+        driver.hold_key('right',2.3)
+        driver.toggle_bike()
+        driver.hold_key('right',1)
+
 
     def farm_money_until_low():
         #Start bot underneath poke-center exit facing down
         print("Going to pokecenter")
-        driver.use_pokecenter()
+        driver.use_pokecenter(location="lacunosa")
+        # driver.fly_to(location="lacunosa")
+        
+        # driver.press_key("up")
+        # driver.press_key("up")
+        
+
         currentPP = 10
         print("Navigating to Grass Patches")
-        navigate_to_grass()
+        navigate_to_high_level_grass()
         driver.press_key('up')
         driver.press_key('up')
         print("Starting farm loop")
@@ -52,18 +68,28 @@ try:
             while((not driver.is_in_battle()) and (not driver.is_in_horde())):
                 driver.look_for_battle()
             print("Battle")
+            in_battle = True
             #wait for battle options to pop up
-            print("waiting for intro animations")
+            print("Intro animations")
             time.sleep(7)
             if (driver.is_in_horde()):
                 print("Fleeing from battle")
                 driver.flee_from_battle()
+                print("Attack animations & battle close")
+                time.sleep(11)
+                in_battle = False
             else:
-                print("using attack")
-                driver.use_first_attack()
-            print("waiting for attack animations & battle close")
-            time.sleep(11)
-            print("holding z through any prompts")
+                while(in_battle):
+                    print("Using attack")
+                    driver.use_first_attack()
+                    print("Attack animations & battle close")
+                    time.sleep(11)
+                    #if battle is over set loop flag to false
+                    if(not driver.is_in_battle()):
+                        print("Enemy pokemon was defeated")
+                        in_battle = False
+            
+            print("Holding z through any prompts")
             driver.hold_key('z',3)
             currentPP -= 1
 

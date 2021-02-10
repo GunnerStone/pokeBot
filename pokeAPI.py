@@ -34,11 +34,13 @@ class pokeAPI:
         else: 
             _ = system('clear') 
 
-    def register_window(self, name="PokеММO", nth=0):
+    def register_window(self, name="", nth=0):
         """ Assigns the instance to a pokemmo window (Required before using any other API functions) """
         def win_enum_callback(handle, param):
-            print(str(win32gui.GetWindowText(handle))+'=='+'PokeMMO = '+str(name == str(win32gui.GetWindowText(handle))))
-            if name == str(win32gui.GetWindowText(handle)):
+            #print(str(win32gui.GetWindowText(handle))[4:7]) #+'=='+'PokeMMO = '+str(name == str(win32gui.GetWindowText(handle))))
+            window_name = str(str(win32gui.GetWindowText(handle))[0:7])
+            print (window_name)
+            if name == window_name:
                 param.append(handle)
 
         handles = []
@@ -76,7 +78,7 @@ class pokeAPI:
         #take screeenshot of enemy hp bar
         x,y = 300, 256
         large = self.screenshotRAM((x,y,104, 9))
-        result = self.match_image(largeImg=large, smallImg='assets/battle_indicator.png',threshold=.1)
+        result = self.match_image(largeImg=large, smallImg='assets/battle_indicator.png',threshold=.05)
         if result is not False:
             return True
         else:
@@ -84,7 +86,7 @@ class pokeAPI:
     def is_in_horde(self):
         x,y = 424, 181
         large = self.screenshotRAM((x,y,52, 9))
-        result = self.match_image(largeImg=large, smallImg='assets/horde_indicator.png',threshold=.1)
+        result = self.match_image(largeImg=large, smallImg='assets/horde_indicator.png',threshold=.05)
         if result is not False:
             return True
         else:
@@ -103,17 +105,25 @@ class pokeAPI:
     def fly_to(self,location="mistralton",hm_slave=5):
         self.click_sidebar_pokemon(hm_slave)
         #click on fly btn
+        time.sleep(.2)
         self.click(x=1738,y=880)
         fly_x, fly_y = 0,0
         if (location == "mistralton"):
             fly_x, fly_y = 565, 540
+        elif (location == "lacunosa"):
+            fly_x, fly_y = 1247, 437
+        time.sleep(.2)
         self.click(fly_x,fly_y)
+        time.sleep(.2)
         self.click(fly_x,fly_y)
+        #wait for fly animation to finish
+        time.sleep(4.5)
+
+    def toggle_bike(self):
+        self.press_key("3")
 
     def use_pokecenter(self,location="mistralton",hm_slave=5):
         self.fly_to(location,hm_slave)
-        #wait for fly animation to finish
-        time.sleep(3.5)
         #walk into pokecenter
         self.hold_key('up',5)
         #talk to nurse joy
@@ -208,7 +218,7 @@ class pokeAPI:
          .move_mouse(x, y, speed=speed)
          .wait(delay))
 
-        pydirectinput.click(button=button)
+        pydirectinput.click(button=button,duration=0.1)
         return self
 
     def screenshot(self, name, region=False):
