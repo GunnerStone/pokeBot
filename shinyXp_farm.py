@@ -5,6 +5,7 @@ from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.styles import Style
 import sys
 import os
+import random
 
 try:
     driver = pokeAPI().register_window(name="РokеММO")
@@ -40,11 +41,10 @@ try:
     def navigate_to_high_level_grass():
         #get on bike
         driver.toggle_bike()
-        driver.hold_key('left',5.6)
-        driver.hold_key('up',1.5)
-        driver.hold_key('right',2.3)
+        driver.hold_key('left',random.uniform(3, 3.3))
         driver.toggle_bike()
-        driver.hold_key('right',1)
+        driver.press_key('up')
+        driver.press_key('up')
 
 
     def farm_money_until_low():
@@ -56,38 +56,50 @@ try:
         # driver.press_key("up")
         # driver.press_key("up")
         
-
-        currentPP = 10
+        #sweet scent can be used 6 times before needing to go to pokecenter
+        currentPP = 6
         print("Navigating to Grass Patches")
         navigate_to_high_level_grass()
-        driver.press_key('up')
-        driver.press_key('up')
         print("Starting farm loop")
         while(currentPP>0):
             print("Looking for battle")
             while((not driver.is_in_battle()) and (not driver.is_in_horde())):
-                driver.look_for_battle()
-            print("Battle")
+                driver.sweet_scent()
+            print("Battle Found")
             in_battle = True
             #wait for battle options to pop up
-            print("Intro animations")
-            time.sleep(7)
             if (driver.is_in_horde()):
-                print("Fleeing from battle")
-                driver.flee_from_battle()
-                print("Attack animations & battle close")
-                time.sleep(11)
-                in_battle = False
+                print("Scanning for Horde Shinies")
+                if(driver.is_shiny_horde() == False):
+                    print("Shiny not found")
+                    print("Using AOE attack")
+                    driver.use_first_attack(is_horde=True)
+                    print("Attack animations & battle close")
+                    time.sleep(12)
+                    in_battle = False
+                else:
+                    print("Shiny found!!!")
+                    print("Stalling until human services game")
+                    while True:
+                        time.sleep(60)
             else:
                 while(in_battle):
-                    print("Using attack")
-                    driver.use_first_attack()
-                    print("Attack animations & battle close")
-                    time.sleep(11)
-                    #if battle is over set loop flag to false
-                    if(not driver.is_in_battle()):
-                        print("Enemy pokemon was defeated")
-                        in_battle = False
+                    print("Scanning for Single-Battle Shinies")
+                    if(driver.is_shiny_single()==False):
+                        print("Shiny not found")
+                        print("Using AOE attack")
+                        driver.use_first_attack()
+                        print("Attack animations & battle close")
+                        time.sleep(12)
+                        #if battle is over set loop flag to false
+                        if(not driver.is_in_battle()):
+                            print("Enemy pokemon was defeated")
+                            in_battle = False
+                    else:
+                        print("Shiny found!!!")
+                        print("Stalling until human services game")
+                        while True:
+                            time.sleep(60)
             
             print("Holding z through any prompts")
             driver.hold_key('z',3)

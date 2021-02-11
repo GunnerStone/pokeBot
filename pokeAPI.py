@@ -5,6 +5,8 @@ import time
 import numpy
 import ctypes
 import pydirectinput
+import pytesseract
+import random
 
 # import only system from os 
 from os import system, name 
@@ -39,9 +41,11 @@ class pokeAPI:
         def win_enum_callback(handle, param):
             #print(str(win32gui.GetWindowText(handle))[4:7]) #+'=='+'PokeMMO = '+str(name == str(win32gui.GetWindowText(handle))))
             window_name = str(str(win32gui.GetWindowText(handle))[0:7])
-            print (window_name)
-            if name == window_name:
-                param.append(handle)
+            if(len(window_name)>2):
+                if (window_name[1]=='o' and window_name[2]=='k'):
+                    print (window_name)
+                if (name[1] == window_name[1] and name[2]== window_name[2]):
+                    param.append(handle)
 
         handles = []
         # Get all windows with the name "Wizard101"
@@ -51,6 +55,19 @@ class pokeAPI:
         # Assigns the one at index nth
         self._handle = handles[nth]
         return self
+
+    def read_text_from_img(self, img):
+        #convert pyautogui/PIL to opencv format (numpy array)
+        img = numpy.array(img,dtype=numpy.uint8) 
+
+        #make image black/white
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY ) 
+        #threshold to isolate black/white color & invert it so text is black
+        _,img = cv2.threshold(img,127,255,cv2.THRESH_BINARY_INV)
+
+        #run tesseract on preprocessed image
+        return pytesseract.image_to_string(img,config='--psm 7')
+
 
     def is_active(self):
         """ Returns true if the window is focused """
@@ -92,21 +109,59 @@ class pokeAPI:
         else:
             return False
 
-    def use_first_attack(self):
+    def use_first_attack(self,is_horde=False):
         time.sleep(.4)
         self.click(x=455,y=690)
         time.sleep(.4)
         self.click(x=455,y=690)
+        if(is_horde==True):
+            time.sleep(.4)
+            self.click(x=455,y=690)
+            time.sleep(.4)
     
     def flee_from_battle(self):
         time.sleep(.4)
         self.click(x=772,y=772)
 
-    def fly_to(self,location="mistralton",hm_slave=5):
-        self.click_sidebar_pokemon(hm_slave)
+    def is_shiny_single(self):
+        x, y, w, h = (365,226, 200, 26)
+        img = self.screenshotRAM((x,y,w,h))
+        name = (self.read_text_from_img(img)).upper()
+        indx = name.find("LV.")-1
+        if indx < 0:
+            indx = 0 
+        name = name[:indx]
+        if(name[0:5]=="SHINY"):
+            print("FOUND A SHINY "+name+"!")
+            return True
+        else:
+            print("Found a "+name+"!")
+        return False
+
+
+
+    def is_shiny_horde(self):
+        namePositions = [(441,210, 220, 26),(441,150, 220, 26),(830,150, 220, 26),(1220,150, 220, 26),(1220,210, 220, 26)]
+        for i in range(len(namePositions)):
+            x, y, w, h = namePositions[i]
+            img = self.screenshotRAM((x,y,w,h))
+            name = (self.read_text_from_img(img)).upper()
+            indx = name.find("LV.")-1
+            if indx < 0:
+                indx = 0 
+            name = name[:indx]
+            if(name[0:5]=="SHINY"):
+                print("FOUND A SHINY "+name+"!")
+                return True
+            else:
+                print("Found a "+name+"!")
+        return False
+
+    def fly_to(self,location="mistralton",hotkey='9'):
         #click on fly btn
-        time.sleep(.2)
-        self.click(x=1738,y=880)
+        time.sleep(.5)
+        self.press_key(hotkey)
+        time.sleep(.5)
         fly_x, fly_y = 0,0
         if (location == "mistralton"):
             fly_x, fly_y = 565, 540
@@ -118,12 +173,19 @@ class pokeAPI:
         self.click(fly_x,fly_y)
         #wait for fly animation to finish
         time.sleep(4.5)
+        return self
+
+    def sweet_scent(self,hotkey='8'):
+        time.sleep(.5)
+        self.press_key(hotkey)
+        time.sleep(13)
+        #print('done casting')
 
     def toggle_bike(self):
         self.press_key("3")
 
-    def use_pokecenter(self,location="mistralton",hm_slave=5):
-        self.fly_to(location,hm_slave)
+    def use_pokecenter(self,location="mistralton",hotkey='9'):
+        self.fly_to(location,hotkey)
         #walk into pokecenter
         self.hold_key('up',5)
         #talk to nurse joy
