@@ -63,10 +63,10 @@ class pokeAPI:
         #make image black/white
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY ) 
         #threshold to isolate black/white color & invert it so text is black
-        _,img = cv2.threshold(img,230,255,cv2.THRESH_BINARY_INV)
+        _,img = cv2.threshold(img,200,255,cv2.THRESH_BINARY_INV)
 
         #run tesseract on preprocessed image
-        return pytesseract.image_to_string(img,config='--psm 7')
+        return pytesseract.image_to_string(img)
 
 
     def is_active(self):
@@ -124,7 +124,7 @@ class pokeAPI:
         self.click(x=772,y=772)
 
     def is_shiny_single(self):
-        x, y, w, h = (365,226, 200, 26)
+        x, y, w, h = (365,226, 270, 26)
         img = self.screenshotRAM((x,y,w,h))
         name = (self.read_text_from_img(img)).upper()
         indx = name.find("LV.")-1
@@ -141,7 +141,7 @@ class pokeAPI:
 
 
     def is_shiny_horde(self):
-        namePositions = [(441,210, 220, 26),(441,150, 220, 26),(830,150, 220, 26),(1220,150, 220, 26),(1220,210, 220, 26)]
+        namePositions = [(441,210, 270, 26),(441,150, 270, 26),(830,150, 270, 26),(1220,150, 270, 26),(1220,210, 270, 26)]
         for i in range(len(namePositions)):
             x, y, w, h = namePositions[i]
             img = self.screenshotRAM((x,y,w,h))
@@ -167,6 +167,8 @@ class pokeAPI:
             fly_x, fly_y = 565, 540
         elif (location == "lacunosa"):
             fly_x, fly_y = 1247, 437
+        elif (location == "icirrus"):
+            fly_x, fly_y = 725,440
         time.sleep(.2)
         self.click(fly_x,fly_y)
         time.sleep(.2)

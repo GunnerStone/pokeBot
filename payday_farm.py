@@ -46,6 +46,7 @@ try:
         driver.toggle_bike()
         driver.hold_key('right',1)
 
+    
 
     def farm_money_until_low():
         #Start bot underneath poke-center exit facing down
