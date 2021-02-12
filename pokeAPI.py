@@ -63,7 +63,7 @@ class pokeAPI:
         #make image black/white
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY ) 
         #threshold to isolate black/white color & invert it so text is black
-        _,img = cv2.threshold(img,127,255,cv2.THRESH_BINARY_INV)
+        _,img = cv2.threshold(img,230,255,cv2.THRESH_BINARY_INV)
 
         #run tesseract on preprocessed image
         return pytesseract.image_to_string(img,config='--psm 7')
