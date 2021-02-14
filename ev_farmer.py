@@ -38,7 +38,10 @@ def navigate_to_low_level_grass():
     driver.hold_key('right',.5)
     driver.hold_key('up',2.4)
     
-def navigate_to_high_level_grass():
+def navigate_to_speed_ev():
+    print("Going to pokecenter")
+    driver.use_pokecenter(location="lacunosa")
+    print("Navigating to Rapidash Grass Patches")
     #get on bike
     driver.toggle_bike()
     driver.hold_key('left',random.uniform(3, 3.3))
@@ -46,32 +49,90 @@ def navigate_to_high_level_grass():
     driver.press_key('up')
     driver.press_key('up')
 
-def navigate_to_druddigon():
+def navigate_to_hp_ev():
+    print("Going to pokecenter")
+    driver.use_pokecenter(location="opelucid")
+    print("Navigating to Buffoulant Grass Patches")
     #get on bike
     driver.toggle_bike()
-    driver.hold_key('left',0.3)
-    driver.hold_key('up',3.2)
-    driver.hold_key('right',0.3)
-    driver.hold_key('up',1.5)
-    driver.hold_key('left',0.15)
-    driver.hold_key('up',3.6)
-    time.sleep(2)
-    driver.press_key('up')
+    driver.hold_key('left',1.4)
+    driver.hold_key('up',2.15)
+    driver.hold_key('right',1.90)
+    driver.hold_key('up',6.5)
+    driver.hold_key('right',2.7)
+    driver.toggle_bike()
+    driver.hold_key('up',.15)
+    driver.toggle_bike()
+    driver.hold_key('right',1.8)
+    driver.toggle_bike()
+    driver.hold_key('up',.3)
 
 
-def farm_money_until_low():
-    #Start bot underneath poke-center exit facing down
+def navigate_to_attack_ev():
     print("Going to pokecenter")
-    driver.use_pokecenter(location="icirrus")
-    # driver.fly_to(location="lacunosa")
+    driver.use_pokecenter(location="opelucid")
+    print("Navigating to Buffoulant Grass Patches")
+    #get on bike
+    driver.toggle_bike()
+    driver.hold_key('left',1.4)
+    driver.hold_key('up',2.15)
+    driver.hold_key('right',1.90)
+    driver.hold_key('up',5.5)
+    driver.hold_key('right',random.uniform(.1,.2))
+    driver.toggle_bike()
+    driver.hold_key('up',.2)
+
+def navigate_to_spattack_ev():
+    print("Going to pokecenter")
+    driver.use_pokecenter(location="opelucid")
+    print("Navigating to Duosion Grass Patches")
+    driver.hold_key('down',.05)
+    #get on bike
+    driver.toggle_bike()
+    driver.hold_key('left',6.8)
+    time.sleep(1.5)
+    driver.hold_key('left',random.uniform(.25,.4))
+    driver.hold_key('down',.2)
+    driver.toggle_bike()
+    driver.press_key('down')
+
+def navigate_to_spdef_ev():
+    print("Going to pokecenter")
+    driver.use_pokecenter(location="undella")
+    print("Navigating to Mantine Surf Patches")
+    driver.hold_key('left',.9)
+    driver.hold_key('down',1.8)
+    driver.surf()
+
+def navigate_to_def_ev():
+    print("Going to pokecenter")
+    driver.use_pokecenter(location="undella")
+    print("Navigating to Mantine Surf Patches")
+    driver.hold_key('left',.9)
+    driver.hold_key('down',.8)
+    driver.toggle_bike()
+    driver.hold_key('right',2.5)
+    driver.toggle_bike()
+    driver.surf()
+
+def farm_evs(ev_type = "spdef"):
+    #Start bot underneath poke-center exit facing down
     
-    # driver.press_key("up")
-    # driver.press_key("up")
     
+    if(ev_type=="attack"):
+        navigate_to_attack_ev()
+    elif(ev_type=="spattack"):
+        navigate_to_spattack_ev()
+    elif(ev_type=="speed"):
+        navigate_to_speed_ev()
+    elif(ev_type=="spdef"):
+        navigate_to_spdef_ev()
+    elif(ev_type=="def"):
+        navigate_to_def_ev()
+    elif(ev_type=="hp"):
+        navigate_to_hp_ev()
     #sweet scent can be used 6 times before needing to go to pokecenter
     currentPP = 6
-    print("Navigating to Grass Patches")
-    navigate_to_druddigon()
     print("Starting farm loop")
     while(currentPP>0):
         print("Looking for battle")
@@ -117,7 +178,6 @@ def farm_money_until_low():
         print("Holding z through any prompts")
         driver.hold_key('z',3)
         currentPP -= 1
-    driver.hold_key('down',1)
     
 
 
@@ -127,9 +187,7 @@ metric_thread = Thread(target=display_metrics,args=())
 try:
     #metric_thread.start()
     while True:
-        #farm_money_until_low()
-        driver.stall_battle()
-        time.sleep(30)
+        farm_evs("hp")
         ROUND_COUNT += 1
 except KeyboardInterrupt:
         print ('Interrupted')

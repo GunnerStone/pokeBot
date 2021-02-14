@@ -7,12 +7,17 @@ import ctypes
 import pydirectinput
 import pytesseract
 import random
-
+import pygetwindow
+import re
 # import only system from os 
 from os import system, name 
 
 
 class pokeAPI:
+
+    #needed if running on Gunner's shitty latptop that cant play in 1920x1080
+    x_offset, y_offset = 9,31
+    w_offset, h_offset = 17,0
     def __init__(self, handle=None):
         self._handle = handle
         self._spell_memory = {}
@@ -35,7 +40,7 @@ class pokeAPI:
         # for mac and linux(here, os.name is 'posix') 
         else: 
             _ = system('clear') 
-
+    
     def register_window(self, name="", nth=0):
         """ Assigns the instance to a pokemmo window (Required before using any other API functions) """
         def win_enum_callback(handle, param):
@@ -54,6 +59,14 @@ class pokeAPI:
         #print(handles)
         # Assigns the one at index nth
         self._handle = handles[nth]
+        win32gui.MoveWindow(self._handle,0,0,1920,1080,True)
+        rect = win32gui.GetWindowRect(self._handle)
+        # x = rect[0]
+        # y = rect[1]
+        # w = rect[2] -x
+        # h = rect[3] - y
+        # x_offset = 1920 - w
+        # y_offset = 1080 - h
         return self
 
     def read_text_from_img(self, img):
@@ -63,7 +76,7 @@ class pokeAPI:
         #make image black/white
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY ) 
         #threshold to isolate black/white color & invert it so text is black
-        _,img = cv2.threshold(img,200,255,cv2.THRESH_BINARY_INV)
+        _,img = cv2.threshold(img,190,255,cv2.THRESH_BINARY_INV)
 
         #run tesseract on preprocessed image
         return pytesseract.image_to_string(img)
@@ -93,7 +106,7 @@ class pokeAPI:
         return
     def is_in_battle(self):
         #take screeenshot of enemy hp bar
-        x,y = 300, 256
+        x,y = 300-self.x_offset, 256-self.y_offset
         large = self.screenshotRAM((x,y,104, 9))
         result = self.match_image(largeImg=large, smallImg='assets/battle_indicator.png',threshold=.05)
         if result is not False:
@@ -101,9 +114,12 @@ class pokeAPI:
         else:
             return False
     def is_in_horde(self):
-        x,y = 424, 181
+        x,y = 424-self.x_offset, 181-self.y_offset
         large = self.screenshotRAM((x,y,52, 9))
-        result = self.match_image(largeImg=large, smallImg='assets/horde_indicator.png',threshold=.05)
+        if(self.x_offset == 0 or self.y_offset == 0):
+            result = self.match_image(largeImg=large, smallImg='assets/horde_indicator.png',threshold=.05)
+        else:
+            result = self.match_image(largeImg=large, smallImg='assets/horde_indicator_laptop.png',threshold=.05)
         if result is not False:
             return True
         else:
@@ -111,25 +127,40 @@ class pokeAPI:
 
     def use_first_attack(self,is_horde=False):
         time.sleep(.4)
-        self.click(x=455,y=690)
+        self.click(x=455-self.x_offset,y=690-self.y_offset)
         time.sleep(.4)
-        self.click(x=455,y=690)
+        self.click(x=455-self.x_offset,y=690-self.y_offset)
         if(is_horde==True):
             time.sleep(.4)
-            self.click(x=455,y=690)
+            self.click(x=455-self.x_offset,y=690-self.y_offset)
             time.sleep(.4)
     
     def flee_from_battle(self):
         time.sleep(.4)
-        self.click(x=772,y=772)
+        self.click(x=772-self.x_offset,y=772-self.y_offset)
+
+    def stall_battle(self):
+        time.sleep(random.uniform(.3,.5))
+        self.click(x=715-self.x_offset,y=740-self.y_offset)
+        time.sleep(random.uniform(.3,.5))
+        self.click(x=715-self.x_offset,y=740-self.y_offset)
+        time.sleep(random.uniform(.3,.5))
+        self.click(x=715-self.x_offset,y=740-self.y_offset)
 
     def is_shiny_single(self):
         x, y, w, h = (365,226, 270, 26)
+        x = x - self.x_offset
+        y = y - self.y_offset
+        w = w + self.w_offset
+        h = h + self.h_offset
         img = self.screenshotRAM((x,y,w,h))
         name = (self.read_text_from_img(img)).upper()
-        indx = name.find("LV.")-1
+        name = re.sub("[^0-9a-zA-Z.]+", "", name)
+        indx = name.find("LV.")
+        if (indx == -1):
+            indx = name.find("LYV.")
         if indx < 0:
-            indx = 0 
+            indx = 5
         name = name[:indx]
         if(name[0:5]=="SHINY"):
             print("FOUND A SHINY "+name+"!")
@@ -144,11 +175,20 @@ class pokeAPI:
         namePositions = [(441,210, 270, 26),(441,150, 270, 26),(830,150, 270, 26),(1220,150, 270, 26),(1220,210, 270, 26)]
         for i in range(len(namePositions)):
             x, y, w, h = namePositions[i]
+            x = x - self.x_offset
+            y = y - self.y_offset
+            w = w + self.w_offset
+            h = h + self.h_offset
             img = self.screenshotRAM((x,y,w,h))
+            #self.screenshot("SHINYTEST"+str(i)+".png",(x,y,w,h))
             name = (self.read_text_from_img(img)).upper()
-            indx = name.find("LV.")-1
+            name = re.sub("[^0-9a-zA-Z.]+", "", name)
+            indx = name.find("LV.")
+            if (indx == -1):
+                indx = name.find("LYV.")
             if indx < 0:
-                indx = 0 
+                indx = 5
+            #print (name) 
             name = name[:indx]
             if(name[0:5]=="SHINY"):
                 print("FOUND A SHINY "+name+"!")
@@ -164,11 +204,15 @@ class pokeAPI:
         time.sleep(.5)
         fly_x, fly_y = 0,0
         if (location == "mistralton"):
-            fly_x, fly_y = 565, 540
+            fly_x, fly_y = 565-self.x_offset , 540-self.y_offset
         elif (location == "lacunosa"):
-            fly_x, fly_y = 1247, 437
+            fly_x, fly_y = 1247-self.x_offset , 437-self.y_offset
         elif (location == "icirrus"):
-            fly_x, fly_y = 725,440
+            fly_x, fly_y = 725-self.x_offset , 440-self.y_offset
+        elif (location == "opelucid"):
+            fly_x, fly_y = 995-self.x_offset , 440-self.y_offset
+        elif (location == "undella"):
+            fly_x, fly_y = 1407-self.x_offset , 540-self.y_offset
         time.sleep(.2)
         self.click(fly_x,fly_y)
         time.sleep(.2)
@@ -183,6 +227,15 @@ class pokeAPI:
         time.sleep(13)
         #print('done casting')
 
+    def surf(self):
+        time.sleep(.5)
+        self.press_key('z')
+        time.sleep(1)
+        self.press_key('z')
+        time.sleep(1)
+        self.press_key('z')
+        time.sleep(3.5)
+
     def toggle_bike(self):
         self.press_key("3")
 
@@ -191,7 +244,7 @@ class pokeAPI:
         #walk into pokecenter
         self.hold_key('up',5)
         #talk to nurse joy
-        self.hold_key('z',7)
+        self.hold_key('z',7.5)
         self.hold_key('down',1.8)
         time.sleep(2.5)
 
