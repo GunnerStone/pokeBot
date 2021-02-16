@@ -197,6 +197,23 @@ class pokeAPI:
                 print("Found a "+name+"!")
         return False
 
+    def fish(self,hotkey='4'):
+        time.sleep(.5)
+        self.press_key(hotkey)
+        time.sleep(4)
+        img = self.screenshotRAM((560-self.x_offset,90-self.y_offset, 75, 40))
+        s = self.read_text_from_img(img).upper()
+        if(len(s)!=0):
+            if(s[0]=='N' and s[1]=='O' and s[2]=='T'):
+                #no fish on the line press z and return
+                self.press_key('z')
+                return self
+        #fish on the line!
+        self.press_key('z')
+        time.sleep(12)
+        print("done fishing")
+        return self
+
     def fly_to(self,location="mistralton",hotkey='9'):
         #click on fly btn
         time.sleep(.5)

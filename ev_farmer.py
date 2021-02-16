@@ -42,10 +42,12 @@ def navigate_to_speed_ev():
     print("Going to pokecenter")
     driver.use_pokecenter(location="lacunosa")
     print("Navigating to Rapidash Grass Patches")
+    driver.press_key('down')
     #get on bike
     driver.toggle_bike()
     driver.hold_key('left',random.uniform(3, 3.3))
     driver.toggle_bike()
+    driver.press_key('up')
     driver.press_key('up')
     driver.press_key('up')
 
@@ -115,7 +117,65 @@ def navigate_to_def_ev():
     driver.toggle_bike()
     driver.surf()
 
-def farm_evs(ev_type = "spdef"):
+def navigate_to_luvdisc():
+    print("Going to pokecenter")
+    driver.use_pokecenter(location="undella")
+    print("Navigating to luvdisc Patch")
+    driver.hold_key('left',.9)
+    driver.hold_key('down',.8)
+    driver.toggle_bike()
+    driver.hold_key('right',random.uniform(.5,1.5))
+    driver.press_key('down')
+
+def farm_heartscales(hotkey='4'):
+    navigate_to_luvdisc()
+    #sweet scent can be used 6 times before needing to go to pokecenter
+    currentPP = 10
+    print("Starting farm loop")
+    while(currentPP>0):
+        print("Looking for battle")
+        while((not driver.is_in_battle()) and (not driver.is_in_horde())):
+            driver.fish(hotkey=hotkey)
+        print("Battle Found")
+        in_battle = True
+        #wait for battle options to pop up
+        if (driver.is_in_horde()):
+            print("Scanning for Horde Shinies")
+            if(driver.is_shiny_horde() == False):
+                print("Shiny not found")
+                print("Using AOE attack")
+                driver.flee_from_battle()
+                print("Fleeing from horde battle")
+                time.sleep(random.uniform(12,15))
+                in_battle = False
+            else:
+                print("Shiny found!!!")
+                print("Stalling until human services game")
+                while True:
+                    time.sleep(60)
+        else:
+            while(in_battle):
+                print("Scanning for Single-Battle Shinies")
+                if(driver.is_shiny_single()==False):
+                    print("Shiny not found")
+                    print("Using first attack")
+                    driver.use_first_attack()
+                    print("Attack animations & battle close")
+                    time.sleep(random.uniform(12,15))
+                    #if battle is over set loop flag to false
+                    if(not driver.is_in_battle()):
+                        print("Enemy pokemon was defeated")
+                        in_battle = False
+                else:
+                    print("Shiny found!!!")
+                    print("Stalling until human services game")
+                    while True:
+                        time.sleep(random.uniform(60, 300))
+                        driver.stall_battle()
+        currentPP -= 1
+    
+
+def farm_evs(ev_type = "def"):
     #Start bot underneath poke-center exit facing down
     
     
@@ -161,7 +221,7 @@ def farm_evs(ev_type = "spdef"):
                 if(driver.is_shiny_single()==False):
                     print("Shiny not found")
                     print("Using AOE attack")
-                    driver.use_first_attack()
+                    driver.flee_from_battle()
                     print("Attack animations & battle close")
                     time.sleep(12)
                     #if battle is over set loop flag to false
@@ -187,7 +247,8 @@ metric_thread = Thread(target=display_metrics,args=())
 try:
     #metric_thread.start()
     while True:
-        farm_evs("hp")
+        farm_evs("spdef")
+        #farm_heartscales()
         ROUND_COUNT += 1
 except KeyboardInterrupt:
         print ('Interrupted')
