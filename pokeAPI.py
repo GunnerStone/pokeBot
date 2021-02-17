@@ -16,8 +16,11 @@ from os import system, name
 class pokeAPI:
 
     #needed if running on Gunner's shitty latptop that cant play in 1920x1080
-    x_offset, y_offset = 9,31
-    w_offset, h_offset = 17,0
+    #x_offset, y_offset = 9,31
+    #w_offset, h_offset = 17,0
+    #needed if on desktop
+    x_offset, y_offset = 9,0
+    w_offset, h_offset = 0,0
     def __init__(self, handle=None):
         self._handle = handle
         self._spell_memory = {}
@@ -241,7 +244,7 @@ class pokeAPI:
     def sweet_scent(self,hotkey='8'):
         time.sleep(.5)
         self.press_key(hotkey)
-        time.sleep(13)
+        time.sleep(14)
         #print('done casting')
 
     def surf(self):
