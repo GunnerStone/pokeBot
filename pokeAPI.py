@@ -17,11 +17,11 @@ import pokeTwilio
 class pokeAPI:
 
     #needed if running on Gunner's shitty latptop that cant play in 1920x1080
-    #x_offset, y_offset = 9,31
-    #w_offset, h_offset = 17,0
+    x_offset, y_offset = 9,31
+    w_offset, h_offset = 17,0
     #needed if on desktop
-    x_offset, y_offset = 9,0
-    w_offset, h_offset = 0,0
+    # x_offset, y_offset = 9,0
+    # w_offset, h_offset = 0,0
     def __init__(self, handle=None):
         self._handle = handle
         self._spell_memory = {}
@@ -112,7 +112,10 @@ class pokeAPI:
         #take screeenshot of enemy hp bar
         x,y = 306-self.x_offset, 256-self.y_offset
         large = self.screenshotRAM((x,y,104, 9))
-        result = self.match_image(largeImg=large, smallImg='assets/battle_indicator.png',threshold=.05)
+        if(self.x_offset == 0 or self.y_offset == 0):
+            result = self.match_image(largeImg=large, smallImg='assets/battle_indicator.png',threshold=.05)
+        else:
+            result = self.match_image(largeImg=large, smallImg='assets/battle_indicator_laptop.png',threshold=.05)
         if result is not False:
             return True
         else:
