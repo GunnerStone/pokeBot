@@ -109,7 +109,7 @@ class pokeAPI:
         return
     def is_in_battle(self):
         #take screeenshot of enemy hp bar
-        x,y = 300-self.x_offset, 256-self.y_offset
+        x,y = 306-self.x_offset, 256-self.y_offset
         large = self.screenshotRAM((x,y,104, 9))
         result = self.match_image(largeImg=large, smallImg='assets/battle_indicator.png',threshold=.05)
         if result is not False:
@@ -151,7 +151,7 @@ class pokeAPI:
         self.click(x=715-self.x_offset,y=740-self.y_offset)
 
     def is_shiny_single(self):
-        x, y, w, h = (365,226, 270, 26)
+        x, y, w, h = (365,226, 370, 26)
         x = x - self.x_offset
         y = y - self.y_offset
         w = w + self.w_offset

@@ -135,6 +135,7 @@ def farm_heartscales(hotkey='4'):
     while(currentPP>0):
         print("Looking for battle")
         while((not driver.is_in_battle()) and (not driver.is_in_horde())):
+            print("In battle: "+str(driver.is_in_battle()))
             driver.fish(hotkey=hotkey)
         print("Battle Found")
         in_battle = True
@@ -247,8 +248,8 @@ metric_thread = Thread(target=display_metrics,args=())
 try:
     #metric_thread.start()
     while True:
-        farm_evs("spdef")
-        #farm_heartscales()
+        #farm_evs("def")
+        farm_heartscales()
         ROUND_COUNT += 1
 except KeyboardInterrupt:
         print ('Interrupted')
