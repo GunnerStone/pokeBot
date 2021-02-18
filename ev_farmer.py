@@ -152,8 +152,10 @@ def farm_heartscales(hotkey='4'):
             else:
                 print("Shiny found!!!")
                 print("Stalling until human services game")
+                pokeTwilio.found_shiny_call()
                 while True:
-                    time.sleep(60)
+                    time.sleep(random.uniform(60, 300))
+                    driver.stall_battle()
         else:
             while(in_battle):
                 print("Scanning for Single-Battle Shinies")
@@ -170,6 +172,7 @@ def farm_heartscales(hotkey='4'):
                 else:
                     print("Shiny found!!!")
                     print("Stalling until human services game")
+                    pokeTwilio.found_shiny_call()
                     while True:
                         time.sleep(random.uniform(60, 300))
                         driver.stall_battle()
@@ -214,8 +217,10 @@ def farm_evs(ev_type = "def"):
             else:
                 print("Shiny found!!!")
                 print("Stalling until human services game")
+                pokeTwilio.found_shiny_call()
                 while True:
-                    time.sleep(60)
+                    time.sleep(random.uniform(60, 300))
+                    driver.stall_battle()
         else:
             while(in_battle):
                 print("Scanning for Single-Battle Shinies")
@@ -232,6 +237,7 @@ def farm_evs(ev_type = "def"):
                 else:
                     print("Shiny found!!!")
                     print("Stalling until human services game")
+                    pokeTwilio.found_shiny_call()
                     while True:
                         time.sleep(random.uniform(60, 300))
                         driver.stall_battle()

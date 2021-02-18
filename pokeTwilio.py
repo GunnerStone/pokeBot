@@ -19,5 +19,6 @@ def found_shiny_call(to_num = config.to_phone_number, from_num = config.from_pho
     auth_token = config.auth_token
     client = Client(account_sid, auth_token)
     client.calls.create(twiml='<Response><Say>You Found a Shiny!</Say></Response>', to = to_num, from_ = from_num)
+    print("Calling Phone Number: "+str(to_num))
 
 # remove this to test function call:  found_shiny_call()
