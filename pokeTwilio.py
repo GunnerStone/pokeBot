@@ -23,5 +23,4 @@ def found_shiny_call(found_pokemon = '', to_num = config.to_phone_number, from_n
     client.calls.create(twiml=formatted, to = to_num, from_ = from_num)
     print("Calling Phone Number: "+str(to_num))
 
-# remove this to test function call:  
-found_shiny_call()
+# remove this to test function call: found_shiny_call()
