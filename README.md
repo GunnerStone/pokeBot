@@ -1,3 +1,3 @@
 # pokeBot
-HELOOAW 
+Hi Coop
 tbd
