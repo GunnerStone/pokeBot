@@ -1,2 +1,2 @@
 # pokeBot
-Depricated Project
+Depricated
