@@ -1,4 +1,2 @@
 # pokeBot
-Hi Coop
-HELOOAW etass
-tbd
+Depricated Project
